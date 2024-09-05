@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cubit/misc/colors.dart';
 import 'package:flutter_cubit/widgets/app_large_text.dart';
+import '../widgets/app_text.dart';
+
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
@@ -38,8 +41,19 @@ class _WelcomePageState extends State<WelcomePage> {
               child:Row(
                 children: [
                   Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       AppLargeText(text: "Trips"),
+                      AppText(text:"Mountain", size:30,),
+                      SizedBox(height: 20),
+                      Container(
+                        width: 250,
+                        child: AppText(
+                            text: "Mountain hikes give you an incredible sense of freedom along with endurance test",
+                             color: AppColors.textColor2,
+                          size: 14,
+                        ),
+                      )
                     ],
                   )
                 ],
