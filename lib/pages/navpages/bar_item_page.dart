@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_cubit/pages/navpages/my_page.dart';
 
 class BarItemPage extends StatelessWidget {
