@@ -2,12 +2,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_cubit/cubit/app_cubit_states.dart';
+import 'package:flutter_cubit/pages/detail_pages/cubit/store_page_info_cubit.dart';
 import 'package:flutter_cubit/widgets/app_buttons.dart';
 import 'package:flutter_cubit/widgets/app_large_text.dart';
-import '../cubit/app_cubits.dart';
-import '../misc/colors.dart';
-import '../widgets/app_text.dart';
-import '../widgets/responsive_button.dart';
+import '../../cubit/app_cubits.dart';
+import '../../misc/colors.dart';
+import '../../widgets/app_text.dart';
+import '../../widgets/responsive_button.dart';
 
 class DetailPage extends StatefulWidget {
   const DetailPage({super.key});
@@ -23,6 +24,13 @@ class _DetailPageState extends State<DetailPage> {
   Widget build(BuildContext context) {
     return BlocBuilder<AppCubits, CubitStates>(builder: (context, state){
       DetailState detail = state as DetailState;
+      var list = BlocProvider.of<StorePageInfoCubits>(context).state;
+      for(int i=0; i<list.length; i++){
+        if(list[i].name == detail.place.name) {
+          selectedIndex = list[i].index!;
+        }
+      }
+
       return Scaffold(
         body: Container(
           width: double.maxFinite,
@@ -107,6 +115,23 @@ class _DetailPageState extends State<DetailPage> {
                           children: List.generate(5, (index){
                             return InkWell(
                               onTap: (){
+                                  var data = state.place;
+                                  var list = BlocProvider.of<StorePageInfoCubits>(context).state;
+                                  for(int i=0; i<list.length; i++){
+                                    if(list[i].name==data.name){
+                                      if(list[i].index==index){
+                                        //if the index is same we are here
+                                        print('we found a match with index ${selectedIndex}');
+                                      }else{
+                                        BlocProvider.of<StorePageInfoCubits>(context).updatePageInfo(detail.place.name, index);
+                                      }
+                                    }
+                                  }
+                                  // only if a button was never clicked
+                                  if(selectedIndex==-1){
+                                  print('inside a condition');
+                                  BlocProvider.of<StorePageInfoCubits>(context).updatePageInfo(detail.place.name, index);
+                                  }
                                 setState(() {
                                   selectedIndex=index;
                                 });
