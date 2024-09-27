@@ -20,14 +20,17 @@ class DetailPage extends StatefulWidget {
 class _DetailPageState extends State<DetailPage> {
   int gottenStars=4;
   int selectedIndex=-1;
+  Color? color = AppColors.mainColor;
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AppCubits, CubitStates>(builder: (context, state){
       DetailState detail = state as DetailState;
       var list = BlocProvider.of<StorePageInfoCubits>(context).state;
+      print('my list length is ${list.length}');
       for(int i=0; i<list.length; i++){
         if(list[i].name == detail.place.name) {
           selectedIndex = list[i].index!;
+          color = list[i].color;
         }
       }
 
@@ -121,17 +124,19 @@ class _DetailPageState extends State<DetailPage> {
                                     if(list[i].name==data.name){
                                       if(list[i].index==index){
                                         //if the index is same we are here
-                                        print('we found a match with index ${selectedIndex}');
                                       }else{
-                                        BlocProvider.of<StorePageInfoCubits>(context).updatePageInfo(detail.place.name, index);
+                                        print('updating info');
+                                        BlocProvider.of<StorePageInfoCubits>(context).updatePageInfo(data.name, index, color);
+                                        selectedIndex = index;
                                       }
                                     }
                                   }
                                   // only if a button was never clicked
                                   if(selectedIndex==-1){
-                                  print('inside a condition');
-                                  BlocProvider.of<StorePageInfoCubits>(context).updatePageInfo(detail.place.name, index);
+                                    print('adding page info');
+                                  BlocProvider.of<StorePageInfoCubits>(context).addPageInfo(detail.place.name, index, color);
                                   }
+
                                 setState(() {
                                   selectedIndex=index;
                                 });
@@ -162,12 +167,59 @@ class _DetailPageState extends State<DetailPage> {
                   right: 20,
                   child: Row(
                     children: [
-                      AppButtons(size: 60,
-                        color: AppColors.textColor1,
-                        backgroundColor: Colors.white,
-                        borderColor: AppColors.textColor1,
-                        isIcon: true,
-                        icon: Icons.favorite_border,
+                      GestureDetector(
+                        onTap: (){
+                          var list = BlocProvider.of<StorePageInfoCubits>(context).state;
+                          if(list.isEmpty){
+                            setState(() {
+                              color = Colors.red;
+                            });
+                            BlocProvider.of<StorePageInfoCubits>(context)
+                                .updatePageWish(detail.place.name, selectedIndex, color);
+                          }else{
+                            //only toggle the color
+                            for(int i=0; i<list.length; i++){
+                              if(list[i].name==detail.place.name){
+                                if(list[i].color==Colors.red){
+
+                                  Future.delayed(Duration.zero, (){
+                                    BlocProvider.of<StorePageInfoCubits>(context)
+                                        .updatePageWish(detail.place.name, selectedIndex, color);
+                                  });
+                                  setState(() {
+                                    color = AppColors.mainColor;
+                                  });
+
+                                  return;
+                                }else if(color==AppColors.mainColor){
+                                  setState(() {
+                                    color = Colors.red;
+                                  });
+                                  BlocProvider.of<StorePageInfoCubits>(context)
+                                      .updatePageWish(detail.place.name, selectedIndex, color);
+                                  return;
+                                }
+                              }else{
+                                if(color==AppColors.mainColor){
+                                  color= Colors.red;
+                                  BlocProvider.of<StorePageInfoCubits>(context)
+                                      .updatePageWish(detail.place.name, selectedIndex, color);
+                                }else{
+                                  color= AppColors.mainColor;
+                                  BlocProvider.of<StorePageInfoCubits>(context)
+                                      .updatePageWish(detail.place.name, selectedIndex, color);
+                                }
+                              }
+                            }
+                          }
+                        },
+                        child: AppButtons(size: 60,
+                          color: color!,
+                          backgroundColor: Colors.white,
+                          borderColor: color!,
+                          isIcon: true,
+                          icon: Icons.favorite_border,
+                        ),
                       ),
                       SizedBox(width: 20),
                       ResponsiveButton(
